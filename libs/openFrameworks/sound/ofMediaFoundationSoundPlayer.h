@@ -1,3 +1,5 @@
+#ifdef _WIN32
+
 #pragma once
 
 #include "ofSoundBaseTypes.h"
@@ -187,7 +189,7 @@ protected:
 	uint32_t mDurationMS = 0;
 
 	// 2 = INT_16, 3 = INT_24 and 4 = FLOAT_32
-	// TODO: Adjust this based on file loaded 
+	// TODO: Adjust this based on file loaded
 	unsigned char mBytesPerSample = 2;
 	uint64_t mTotalNumFrames = 0;
 	size_t mBufferIndex = 0;
@@ -274,3 +276,5 @@ protected:
 	std::mutex mSrcReaderMutex;
 	bool mBRequestNewReaderSample = false;
 };
+
+#endif

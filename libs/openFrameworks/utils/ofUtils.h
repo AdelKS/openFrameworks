@@ -2,11 +2,8 @@
 
 #include "ofConstants.h"
 
-#if !defined(TARGET_MINGW) 
-	#include "utf8.h"
-#else
-	#include "utf8cpp/utf8.h" // MSYS2 : use of system-installed include
-#endif
+
+#include "utf8cpp/utf8.h" // MSYS2 : use of system-installed include
 #include <bitset> // For ofToBinary.
 #include <chrono>
 #include <iomanip>  //for setprecision
@@ -619,7 +616,7 @@ template <typename ... Args>
 std::string ofVAArgsToString(const char * format, Args&& ... args){
 	char buf[256];
 	size_t n = std::snprintf(buf, sizeof(buf), format, std::forward<Args>(args)...);
-	
+
 //	std::string str = format;
 //	size_t n = std::snprintf(buf, sizeof(buf), str, std::forward<Args>(args)...);
 
@@ -631,7 +628,7 @@ std::string ofVAArgsToString(const char * format, Args&& ... args){
 	// Static buffer too small
 	std::string s(n + 1, 0);
 	std::snprintf(const_cast<char*>(s.data()), s.size(), format, std::forward<Args>(args)...);
-	
+
 	return s;
 
 }

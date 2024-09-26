@@ -1,3 +1,5 @@
+#ifdef __unix__
+
 #include "ofAppEGLWindow.h"
 
 #include "ofGraphics.h" // used in runAppViaInfiniteLoop()
@@ -27,6 +29,13 @@
 #include "sys/ioctl.h"
 
 #include <string.h> // strlen
+
+using std::string;
+using std::map;
+using std::make_shared;
+using std::shared_ptr;
+using std::endl;
+using std::queue;
 
 // native events
 struct udev* udev;
@@ -1427,7 +1436,7 @@ void ofAppEGLWindow::setupNativeInput(){
 	tc.c_lflag &= ~ECHO;
 	tc.c_lflag |= ECHONL;
 	tcsetattr(STDIN_FILENO, TCSAFLUSH, &tc);
-	
+
 	mb.mouseButtonState = 0;
 
 	kb.shiftPressed = false;
@@ -1495,7 +1504,7 @@ void ofAppEGLWindow::printInput(){
 
 void ofAppEGLWindow::destroyNativeInput(){
 	ofLogNotice("ofAppEGLWindow") << "destroyNativeInput()";
-	
+
 	for(device::iterator iter = inputDevices.begin(); iter != inputDevices.end(); iter++){
 		if(iter->second >= 0){
             ::close(iter->second);
@@ -1517,7 +1526,7 @@ void ofAppEGLWindow::processInput(int fd, const char * node){
 	static ofMouseEventArgs mouseEvent;
 	struct input_event ev;
 	char key = 0;
-	
+
 	bool pushKeyEvent = false;
 	bool pushMouseEvent = false;
 	bool pushTouchEvent = false;
@@ -1567,7 +1576,7 @@ void ofAppEGLWindow::processInput(int fd, const char * node){
 					pushMouseEvent = true;
 				}
 			}else if(ev.code == BTN_TOUCH){
-				if(ev.value == 0){ // release	
+				if(ev.value == 0){ // release
 					touchEvent.type = ofTouchEventArgs::up;
 					touchEvent.id = 0;
 					mt[touchEvent.id] = 0;
@@ -1727,7 +1736,7 @@ void ofAppEGLWindow::processInput(int fd, const char * node){
 						}else{
 							ofLogNotice("ofAppEGLWindow") << "readKeyboardEvents(): input_event.code is outside of our small range";
 						}
-				}	
+				}
 			}
 		}else if (ev.type == EV_REL){
 			int axis = ev.code;
@@ -1778,7 +1787,7 @@ void ofAppEGLWindow::processInput(int fd, const char * node){
 							pushTouchEvent = true;
 						}
 					}
-					else 
+					else
 					{
 						if (mt[touchEvent.id] == 0){
 							touchEvent.type = ofTouchEventArgs::down;
@@ -1836,8 +1845,8 @@ void ofAppEGLWindow::processInput(int fd, const char * node){
 			}
 		}
 
-		
-		
+
+
 
 		if(pushKeyEvent){
 			lock();
@@ -1845,7 +1854,7 @@ void ofAppEGLWindow::processInput(int fd, const char * node){
 			unlock();
 			pushKeyEvent = false;
 		}
-		
+
 		if(pushMouseEvent){
 			// lock the thread for a moment while we copy the data
 			lock();
@@ -1921,7 +1930,7 @@ void ofAppEGLWindow::readNativeUDevEvents() {
 					removeInput(devnode);
                 }
             }
-			
+
 			udev_device_unref(dev);
 		}else{
 			ofLogNotice("ofAppEGLWindow") << "readNativeUDevEvents(): device returned by receive_device() is NULL";
@@ -2300,3 +2309,5 @@ void ofAppEGLWindow::handleX11Event(const XEvent& event){
 	  }*/
 	}
 }
+
+#endif

@@ -1,3 +1,5 @@
+#ifdef _WIN32
+
 #pragma once
 
 #include <mfmediaengine.h>
@@ -23,7 +25,7 @@ namespace of {
 class ofMediaFoundationPlayer : public ofBaseVideoPlayer, public of::MediaEngineNotifyCallback {
 protected:
     friend class ofMediaFoundationSoundPlayer;
-    
+
     // MediaEngineNotify: Implements the callback for Media Engine event notification.
     class ofMEEventProcessor : public IMFMediaEngineNotify {
     public:
@@ -164,11 +166,11 @@ public:
     public:
         virtual bool allocate(ofPixelFormat afmt, int aw, int ah);
         virtual bool transferFrame(IMFMediaEngine* aengine) = 0;
-        virtual bool create(DXGI_FORMAT aDxFormat) = 0; 
+        virtual bool create(DXGI_FORMAT aDxFormat) = 0;
         virtual bool isValid() = 0;
         virtual bool draw(ofPixels& apix) = 0;
         virtual bool updatePixels(ofTexture& aSrcTex, ofPixels& apix, ofPixelFormat aTargetPixFormat) = 0;
-        
+
         int getWidth() { return mWidth; }
         int getHeight() { return mHeight; }
 
@@ -186,7 +188,7 @@ public:
     };
 
 protected:
-    
+
     void handleMEEvent(DWORD aevent);
     void updateDuration();
 
@@ -218,7 +220,7 @@ protected:
     static std::shared_ptr<MEDXDeviceManager> sDeviceManager;
 
     DXGI_FORMAT m_d3dFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
-    
+
     // Media Engine related
     Microsoft::WRL::ComPtr<IMFMediaEngine> m_spMediaEngine;
     Microsoft::WRL::ComPtr<IMFMediaEngineEx> m_spEngineEx;
@@ -233,7 +235,7 @@ protected:
     std::queue<DWORD> mEventsQueue;
     std::mutex mMutexEvents;
     // needed to copy the pixels while in lock()
-    // also an easy color conversion 
+    // also an easy color conversion
     ofFbo mFbo;
     ofTexture mCopyTex;
     ofPixels mPixels;
@@ -244,5 +246,7 @@ protected:
     std::atomic_bool mBIsDoneAtomic;
     std::atomic_bool mBIsClosedAtomic;
     std::condition_variable mWaitCondition;
-    
+
 };
+
+#endif

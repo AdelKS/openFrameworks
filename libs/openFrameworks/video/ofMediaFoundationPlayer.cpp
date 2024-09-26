@@ -1,4 +1,6 @@
 
+#ifdef _WIN32
+
 #include "ofPixels.h"
 #include "ofMediaFoundationPlayer.h"
 #include "ofLog.h"
@@ -126,7 +128,7 @@ public:
         _bstrStr = nullptr;
     }
 
-    operator BSTR() const { 
+    operator BSTR() const {
         return _bstrStr;
     }
 private:
@@ -263,10 +265,10 @@ bool SharedDXGLTexture::create(DXGI_FORMAT aDxFormat) {
 
     if (SUCCEEDED(dxMan->getD11Device()->CreateTexture2D(&desc, nullptr, mDXTex.GetAddressOf()))) {
         mGLDX_Handle = wglDXRegisterObjectNV(
-            dxMan->getGLHandleD3D(), 
+            dxMan->getGLHandleD3D(),
             mDXTex.Get(),
             mOfTex->getTextureData().textureID,
-            GL_TEXTURE_2D, 
+            GL_TEXTURE_2D,
             WGL_ACCESS_READ_ONLY_NV);
 
         D3D11_TEXTURE2D_DESC desc2;
@@ -405,7 +407,7 @@ bool SharedDXGLTexture::updatePixels(ofTexture& aSrcTex, ofPixels& apix, ofPixel
 
 //----------------------------------------------
 SharedDXGLTexture::~SharedDXGLTexture() {
-    // release the handle 
+    // release the handle
     if (mGLDX_Handle != nullptr) {
         if (wglGetCurrentContext() != nullptr) {
             if (isLocked()) {
@@ -435,7 +437,7 @@ bool WICTextureManager::allocate(ofPixelFormat afmt, int aw, int ah) {
 
 //----------------------------------------------
 bool WICTextureManager::create(DXGI_FORMAT aDxFormat) {
-    
+
     if (mBValid && mWicFactory) {
         unsigned int tw = static_cast<unsigned int>(getWidth());
         unsigned int th = static_cast<unsigned int>(getHeight());
@@ -523,7 +525,7 @@ bool WICTextureManager::updatePixels(ofTexture& aSrcTex, ofPixels& apix, ofPixel
             apix.swapRgb();
         }
     } else {
-        // swap around pixels 
+        // swap around pixels
         apix.allocate(mSrcPixels.getWidth(), mSrcPixels.getHeight(), aTargetPixFormat);
         _swapPixelsFromSrc4ChannelTo3(apix);
     }
@@ -726,7 +728,7 @@ bool ofMediaFoundationPlayer::_load(std::string name, bool abAsync) {
 
     m_spMediaEngine->SetAutoPlay(FALSE);
 
-    // now lets make a BSTR 
+    // now lets make a BSTR
     m_spMediaEngine->SetSource(BstrURL(absPath));
 
     hr = m_spMediaEngine->Load();
@@ -781,7 +783,7 @@ void ofMediaFoundationPlayer::close() {
 
     m_spMediaEngine = nullptr;
 
-    // clear out the events 
+    // clear out the events
     {
         std::unique_lock<std::mutex> lk(mMutexEvents);
         if (!mEventsQueue.empty()) {
@@ -913,7 +915,7 @@ void ofMediaFoundationPlayer::update() {
     // now lets update the events in the queue
     bool bHasEvent = true;
     DWORD tevent;
-    while (bHasEvent && (numEventsProcessed < mMaxEventsToProcess) ) { 
+    while (bHasEvent && (numEventsProcessed < mMaxEventsToProcess) ) {
         bHasEvent = false;
         {
             std::unique_lock<std::mutex> lk(mMutexEvents);
@@ -940,7 +942,7 @@ bool ofMediaFoundationPlayer::isFrameNew() const {
 void ofMediaFoundationPlayer::play() {
     if (m_spMediaEngine) {
         if (mBDone) {
-            setPosition(0.f);   
+            setPosition(0.f);
         }
         m_spMediaEngine->Play();
         mBDone = false;
@@ -1052,7 +1054,7 @@ void ofMediaFoundationPlayer::setSpeed(float speed) {
 void ofMediaFoundationPlayer::setVolume(float volume) {
     if (m_spMediaEngine) {
         ofMediaFoundationUtils::CallAsyncBlocking(
-            [&] {m_spMediaEngine->SetVolume(static_cast<double>(volume)); 
+            [&] {m_spMediaEngine->SetVolume(static_cast<double>(volume));
         });
     }
 }
@@ -1273,7 +1275,7 @@ void ofMediaFoundationPlayer::handleMEEvent(DWORD aevent) {
             //);
             // MF_MT_FRAME_RATE
             DWORD nstreams;
-            
+
             if (m_spEngineEx && SUCCEEDED(m_spEngineEx->GetNumberOfStreams(&nstreams)) ) {
                 if (nstreams > 0) {
 
@@ -1365,7 +1367,7 @@ void ofMediaFoundationPlayer::handleMEEvent(DWORD aevent) {
     }
     MF_MEDIA_ENGINE_EVENT mfEvent = static_cast<MF_MEDIA_ENGINE_EVENT>(aevent);
     ofNotifyEvent(MFEngineEvent, mfEvent, this);
-    
+
 }
 
 //-----------------------------------------
@@ -1384,3 +1386,4 @@ void ofMediaFoundationPlayer::updateDuration() {
     }
 }
 
+#endif
